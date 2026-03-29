@@ -1,0 +1,135 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: quest-backend
+  namespace: quest-management
+  labels:
+    app: quest-management
+    component: backend
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: quest-management
+      component: backend
+  template:
+    metadata:
+      labels:
+        app: quest-management
+        component: backend
+    spec:
+      containers:
+      - name: quest-backend
+        image: quest-backend:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 5000
+          name: http
+        env:
+        - name: NODE_ENV
+          valueFrom:
+            configMapKeyRef:
+              name: quest-config
+              key: NODE_ENV
+        - name: DATABASE_URL
+          value: "postgresql://$(POSTGRES_USER):$(POSTGRES_PASSWORD)@$(POSTGRES_HOST):$(POSTGRES_PORT)/$(POSTGRES_DB)"
+        - name: POSTGRES_USER
+          valueFrom:
+            configMapKeyRef:
+              name: quest-config
+              key: POSTGRES_USER
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: quest-secrets
+              key: POSTGRES_PASSWORD
+        - name: POSTGRES_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: quest-config
+              key: POSTGRES_HOST
+        - name: POSTGRES_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: quest-config
+              key: POSTGRES_PORT
+        - name: POSTGRES_DB
+          valueFrom:
+            configMapKeyRef:
+              name: quest-config
+              key: POSTGRES_DB
+        - name: REDIS_URL
+          value: "redis://:$(REDIS_PASSWORD)@$(REDIS_HOST):$(REDIS_PORT)"
+        - name: REDIS_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: quest-secrets
+              key: REDIS_PASSWORD
+        - name: REDIS_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: quest-config
+              key: REDIS_HOST
+        - name: REDIS_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: quest-config
+              key: REDIS_PORT
+        - name: JWT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: quest-secrets
+              key: JWT_SECRET
+        - name: FRONTEND_URL
+          valueFrom:
+            configMapKeyRef:
+              name: quest-config
+              key: FRONTEND_URL
+        - name: SOCKET_CORS_ORIGIN
+          valueFrom:
+            configMapKeyRef:
+              name: quest-config
+              key: SOCKET_CORS_ORIGIN
+        - name: LOG_LEVEL
+          valueFrom:
+            configMapKeyRef:
+              name: quest-config
+              key: LOG_LEVEL
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 5000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 5000
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 3
+        volumeMounts:
+        - name: logs
+          mountPath: /app/logs
+        - name: uploads
+          mountPath: /app/uploads
+      volumes:
+      - name: logs
+        persistentVolumeClaim:
+          claimName: quest-logs-pvc
+      - name: uploads
+        persistentVolumeClaim:
+          claimName: quest-uploads-pvc
+      restartPolicy: Always
+      imagePullSecrets:
+      - name: registry-secret

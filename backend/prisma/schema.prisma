@@ -1,0 +1,83 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  role      String   @default("user")
+  points    Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  submissions Submission[]
+  achievements Achievement[]
+  rewards     Reward[]
+}
+
+model Quest {
+  id          String   @id @default(uuid())
+  title       String
+  description String
+  reward      Int
+  difficulty  String   @default("medium")
+  category    String   @default("general")
+  isActive    Boolean  @default(true)
+  createdBy   String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  submissions Submission[]
+  achievements Achievement[]
+  rewards     Reward[]
+}
+
+model Submission {
+  id          String   @id @default(uuid())
+  userId      String
+  questId     String
+  status      String   @default("pending")
+  content     String?
+  submittedAt DateTime @default(now())
+  reviewedAt  DateTime?
+  reviewedBy  String?
+  feedback    String?
+
+  user     User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  quest    Quest @relation(fields: [questId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, questId])
+}
+
+model Achievement {
+  id          String   @id @default(uuid())
+  userId      String
+  questId     String
+  earnedAt    DateTime @default(now())
+
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  quest Quest @relation(fields: [questId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, questId])
+}
+
+model Reward {
+  id          String   @id @default(uuid())
+  userId      String
+  questId     String?
+  type        String
+  points      Int
+  description String
+  metadata    Json?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  quest Quest? @relation(fields: [questId], references: [id], onDelete: Cascade)
+}

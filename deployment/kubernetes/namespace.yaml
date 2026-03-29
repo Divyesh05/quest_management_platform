@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: quest-management
+  labels:
+    name: quest-management
+    app: quest-management
+spec:
+  finalizers:
+  - kubernetes
