@@ -108,6 +108,11 @@ try {
   app.use('/api/leaderboard', leaderboardRoutes);
   console.log('✅ Leaderboard routes loaded');
 
+  // Achievement routes
+  const achievementRoutes = require('./modules/achievement/routes').default;
+  app.use('/api/achievements', achievementRoutes);
+  console.log('✅ Achievement routes loaded');
+
 } catch (error: any) {
   console.error('❌ Error loading routes:', error.message);
   console.error('📍 Stack trace:', error.stack);

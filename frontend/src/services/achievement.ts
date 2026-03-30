@@ -17,7 +17,19 @@ export const achievementService = {
     const queryString = params.toString();
     const url = `/achievements${queryString ? `?${queryString}` : ''}`;
     
-    return await apiGet<PaginatedResponse<Achievement>>(url);
+    const response = await apiGet<{
+      achievements: Achievement[];
+      total: number;
+      page: number;
+      totalPages: number;
+    }>(url);
+    
+    return {
+      data: response.achievements,
+      total: response.total,
+      page: response.page,
+      totalPages: response.totalPages,
+    };
   },
 
   // Get current user's achievements
@@ -33,7 +45,19 @@ export const achievementService = {
     const queryString = params.toString();
     const url = `/achievements/my${queryString ? `?${queryString}` : ''}`;
     
-    return await apiGet<PaginatedResponse<Achievement>>(url);
+    const response = await apiGet<{
+      achievements: Achievement[];
+      total: number;
+      page: number;
+      totalPages: number;
+    }>(url);
+    
+    return {
+      data: response.achievements,
+      total: response.total,
+      page: response.page,
+      totalPages: response.totalPages,
+    };
   },
 
   // Get achievement by ID

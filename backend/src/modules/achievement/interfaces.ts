@@ -23,8 +23,10 @@ export interface IAchievementFilters {
   page?: number;
   limit?: number;
   userId?: string;
+  questId?: string;
   category?: string;
   difficulty?: string;
+  timeRange?: 'all' | 'week' | 'month' | 'year';
 }
 
 export interface ILeaderboardFilters {
