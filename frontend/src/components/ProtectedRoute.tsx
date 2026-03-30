@@ -1,0 +1,27 @@
+import React from 'react';
+import { Navigate, useLocation } from 'react-router-dom';
+import { authService } from '@/services/auth';
+
+interface ProtectedRouteProps {
+  children: React.ReactNode;
+  requireAdmin?: boolean;
+}
+
+export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ 
+  children, 
+  requireAdmin = false 
+}) => {
+  const location = useLocation();
+  const isAuthenticated = authService.isAuthenticated();
+  const user = authService.getStoredUser();
+
+  if (!isAuthenticated) {
+    return <Navigate to="/login" state={{ from: location }} replace />;
+  }
+
+  if (requireAdmin && user?.role !== 'admin') {
+    return <Navigate to="/dashboard" replace />;
+  }
+
+  return <>{children}</>;
+};

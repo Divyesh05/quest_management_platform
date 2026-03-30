@@ -1,22 +1,15 @@
 import { Request, Response, NextFunction } from 'express';
-import { PrismaClient } from '@prisma/client';
 import { AuthService } from './service';
 import { ILoginData, IRegisterData } from './interfaces';
 import { validateRegister, validateLogin } from './validation';
 
-const prisma = new PrismaClient();
-
 export class AuthController {
-  private authService: AuthService;
 
-  constructor() {
-    this.authService = new AuthService();
-  }
-
-  register = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  static register = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const validatedData: IRegisterData = validateRegister(req.body);
-      const result = await this.authService.register(validatedData);
+      const authService = new AuthService();
+      const result = await authService.register(validatedData);
       
       res.status(201).json({
         success: true,
@@ -28,10 +21,11 @@ export class AuthController {
     }
   };
 
-  login = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  static login = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const validatedData: ILoginData = validateLogin(req.body);
-      const result = await this.authService.login(validatedData);
+      const authService = new AuthService();
+      const result = await authService.login(validatedData);
       
       res.status(200).json({
         success: true,
@@ -43,46 +37,7 @@ export class AuthController {
     }
   };
 
-  getProfile = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-    try {
-      const userId = (req as any).user?.userId;
-      if (!userId) {
-        res.status(401).json({
-          success: false,
-          message: 'Authentication required'
-        });
-        return;
-      }
-      
-      const user = await prisma.user.findUnique({
-        where: { id: userId },
-        select: {
-          id: true,
-          email: true,
-          role: true,
-          points: true,
-          createdAt: true
-        }
-      });
-
-      if (!user) {
-        res.status(404).json({
-          success: false,
-          message: 'User not found'
-        });
-        return;
-      }
-
-      res.status(200).json({
-        success: true,
-        data: user
-      });
-    } catch (error) {
-      next(error);
-    }
-  };
-
-  logout = async (_req: Request, res: Response, next: NextFunction): Promise<void> => {
+  static logout = async (_req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       res.status(200).json({
         success: true,
@@ -93,7 +48,7 @@ export class AuthController {
     }
   };
 
-  getMe = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  static getMe = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const userId = (req as any).user?.userId;
       if (!userId) {
@@ -104,16 +59,8 @@ export class AuthController {
         return;
       }
       
-      const user = await prisma.user.findUnique({
-        where: { id: userId },
-        select: {
-          id: true,
-          email: true,
-          role: true,
-          points: true,
-          createdAt: true
-        }
-      });
+      const authService = new AuthService();
+      const user = await authService.getUserById(userId);
 
       if (!user) {
         res.status(404).json({
@@ -132,7 +79,7 @@ export class AuthController {
     }
   };
 
-  updateMe = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  static updateMe = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const userId = (req as any).user?.userId;
       if (!userId) {
@@ -145,17 +92,8 @@ export class AuthController {
       
       const { email } = req.body;
       
-      const user = await prisma.user.update({
-        where: { id: userId },
-        data: { email },
-        select: {
-          id: true,
-          email: true,
-          role: true,
-          points: true,
-          createdAt: true
-        }
-      });
+      const authService = new AuthService();
+      const user = await authService.updateUser(userId, { email });
 
       res.status(200).json({
         success: true,
@@ -167,7 +105,7 @@ export class AuthController {
     }
   };
 
-  forgotPassword = async (_req: Request, res: Response, next: NextFunction): Promise<void> => {
+  static forgotPassword = async (_req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       res.status(200).json({
         success: true,
@@ -178,7 +116,7 @@ export class AuthController {
     }
   };
 
-  resetPassword = async (_req: Request, res: Response, next: NextFunction): Promise<void> => {
+  static resetPassword = async (_req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       res.status(200).json({
         success: true,
@@ -189,7 +127,7 @@ export class AuthController {
     }
   };
 
-  verifyEmail = async (_req: Request, res: Response, next: NextFunction): Promise<void> => {
+  static verifyEmail = async (_req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       res.status(200).json({
         success: true,
@@ -200,17 +138,10 @@ export class AuthController {
     }
   };
 
-  getAllUsers = async (_req: Request, res: Response, next: NextFunction): Promise<void> => {
+  static getAllUsers = async (_req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-      const users = await prisma.user.findMany({
-        select: {
-          id: true,
-          email: true,
-          role: true,
-          points: true,
-          createdAt: true
-        }
-      });
+      const authService = new AuthService();
+      const users = await authService.getAllUsers();
 
       res.status(200).json({
         success: true,
@@ -221,22 +152,13 @@ export class AuthController {
     }
   };
 
-  updateUserRole = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  static updateUserRole = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const { id } = req.params;
       const { role } = req.body;
       
-      const user = await prisma.user.update({
-        where: { id },
-        data: { role },
-        select: {
-          id: true,
-          email: true,
-          role: true,
-          points: true,
-          createdAt: true
-        }
-      });
+      const authService = new AuthService();
+      const user = await authService.updateUserRole(id, role);
 
       res.status(200).json({
         success: true,
@@ -248,13 +170,12 @@ export class AuthController {
     }
   };
 
-  deleteUser = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  static deleteUser = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const { id } = req.params;
       
-      await prisma.user.delete({
-        where: { id }
-      });
+      const authService = new AuthService();
+      await authService.deleteUser(id);
 
       res.status(200).json({
         success: true,
