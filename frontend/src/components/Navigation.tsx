@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { authService } from '@/services/auth';
 
@@ -9,7 +9,6 @@ interface NavigationProps {
 
 export const Navigation: React.FC<NavigationProps> = ({ user }) => {
   const location = useLocation();
-  const navigate = useNavigate();
 
   const handleLogout = () => {
     authService.logout();

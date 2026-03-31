@@ -21,17 +21,20 @@ export const questService = {
 
   // Get quest by ID
   getQuestById: async (id: string): Promise<Quest> => {
-    return await apiGet<Quest>(`/quests/${id}`);
+    const response = await apiGet<{ success: boolean; data: Quest }>(`/quests/${id}`);
+    return response.data;
   },
 
   // Create new quest (admin only)
   createQuest: async (data: CreateQuestData): Promise<Quest> => {
-    return await apiPost<Quest>('/quests', data);
+    const response = await apiPost<{ success: boolean; data: Quest }>('/quests', data);
+    return response.data;
   },
 
   // Update quest (admin only)
   updateQuest: async (id: string, data: UpdateQuestData): Promise<Quest> => {
-    return await apiPut<Quest>(`/quests/${id}`, data);
+    const response = await apiPut<{ success: boolean; data: Quest }>(`/quests/${id}`, data);
+    return response.data;
   },
 
   // Delete quest (admin only)
@@ -41,12 +44,14 @@ export const questService = {
 
   // Toggle quest active status (admin only)
   toggleQuestStatus: async (id: string): Promise<Quest> => {
-    return await apiPut<Quest>(`/quests/${id}/toggle`);
+    const response = await apiPut<{ success: boolean; data: Quest }>(`/quests/${id}/toggle`);
+    return response.data;
   },
 
   // Get quest categories
   getCategories: async (): Promise<string[]> => {
-    return await apiGet<string[]>('/quests/categories');
+    const response = await apiGet<{ success: boolean; data: string[] }>('/quests/categories');
+    return response.data;
   },
 
   // Get quest statistics
@@ -116,16 +121,19 @@ export const questService = {
 
   // Get recommended quests for user
   getRecommendedQuests: async (limit: number = 5): Promise<Quest[]> => {
-    return await apiGet<Quest[]>(`/quests/recommended?limit=${limit}`);
+    const response = await apiGet<{ success: boolean; data: Quest[] }>(`/quests/recommended?limit=${limit}`);
+    return response.data;
   },
 
   // Get popular quests
   getPopularQuests: async (limit: number = 5): Promise<Quest[]> => {
-    return await apiGet<Quest[]>(`/quests/popular?limit=${limit}`);
+    const response = await apiGet<{ success: boolean; data: Quest[] }>(`/quests/popular?limit=${limit}`);
+    return response.data;
   },
 
   // Get latest quests
   getLatestQuests: async (limit: number = 5): Promise<Quest[]> => {
-    return await apiGet<Quest[]>(`/quests/latest?limit=${limit}`);
+    const response = await apiGet<{ success: boolean; data: Quest[] }>(`/quests/latest?limit=${limit}`);
+    return response.data;
   },
 };

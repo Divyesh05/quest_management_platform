@@ -20,5 +20,7 @@ router.get('/', authenticateToken, authorize('admin'), asyncHandler(UserControll
 router.get('/:id', authenticateToken, authorize('admin'), asyncHandler(UserController.getUserById));
 router.put('/:id', authenticateToken, authorize('admin'), asyncHandler(UserController.updateUser));
 router.delete('/:id', authenticateToken, authorize('admin'), asyncHandler(UserController.deleteUser));
+router.put('/:id/points', authenticateToken, authorize('admin'), asyncHandler(UserController.addPoints));
+router.put('/:id/points/deduct', authenticateToken, authorize('admin'), asyncHandler(UserController.deductPoints));
 
 export default router;

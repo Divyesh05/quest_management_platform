@@ -25,6 +25,8 @@ import { SubmissionsPage } from './pages/SubmissionsPage';
 import { LeaderboardPage } from './pages/LeaderboardPage';
 import { ProfilePage } from './pages/ProfilePage';
 import { AdminDashboardPage } from './pages/AdminDashboardPage';
+import { QuestCreatePage } from './pages/QuestCreatePage';
+import { AdminUsersPage } from './pages/AdminUsersPage';
 
 // Layout Components
 import { Navigation } from './components/Navigation';
@@ -101,7 +103,10 @@ const LoginPage: React.FC = () => {
     setIsLoading(true);
 
     try {
-      const data = await apiPost("/auth/login", { email, password });
+      const data = await apiPost("/auth/login", { email, password }) as {
+        success: boolean;
+        data: { token: string; user: User };
+      };
 
       if (data.success) {
         localStorage.setItem("token", data.data.token);
@@ -461,6 +466,28 @@ const App: React.FC = () => {
                 <Layout>
                   <Navigation user={authService.getStoredUser()} />
                   <AdminDashboardPage />
+                </Layout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/quests/create"
+            element={
+              <ProtectedRoute requireAdmin>
+                <Layout>
+                  <Navigation user={authService.getStoredUser()} />
+                  <QuestCreatePage />
+                </Layout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/users"
+            element={
+              <ProtectedRoute requireAdmin>
+                <Layout>
+                  <Navigation user={authService.getStoredUser()} />
+                  <AdminUsersPage />
                 </Layout>
               </ProtectedRoute>
             }

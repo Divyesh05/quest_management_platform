@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Textarea } from '@/components/ui/textarea';
-import { questService } from '@/services/quest';
-import { submissionService } from '@/services/submission';
-import { Quest, Submission } from '@/types';
+import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
+import { Button } from '../components/ui/button';
+import { Badge } from '../components/ui/badge';
+import { Textarea } from '../components/ui/textarea';
+import { questService } from '../services/quest';
+import { submissionService } from '../services/submission';
+import { Quest, Submission } from '../types';
 
 export const QuestDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -68,9 +68,9 @@ export const QuestDetailPage: React.FC = () => {
 
   const getDifficultyColor = (difficulty: string) => {
     switch (difficulty) {
-      case 'easy': return 'bg-green-100 text-green-800';
-      case 'medium': return 'bg-yellow-100 text-yellow-800';
-      case 'hard': return 'bg-red-100 text-red-800';
+      case 'Easy': return 'bg-green-100 text-green-800';
+      case 'Medium': return 'bg-yellow-100 text-yellow-800';
+      case 'Hard': return 'bg-red-100 text-red-800';
       default: return 'bg-gray-100 text-gray-800';
     }
   };
@@ -240,9 +240,9 @@ export const QuestDetailPage: React.FC = () => {
                   <span className="font-medium">Last Updated:</span>{' '}
                   {new Date(quest.updatedAt).toLocaleDateString()}
                 </div>
-                {quest.createdBy && (
+                {quest.createdByUser && (
                   <div>
-                    <span className="font-medium">Created By:</span> {quest.createdBy}
+                    <span className="font-medium">Created By:</span> {quest.createdByUser.email}
                   </div>
                 )}
               </div>

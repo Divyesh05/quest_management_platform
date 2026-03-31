@@ -64,6 +64,12 @@ router.get('/:id',
     const quest = await prisma.quest.findUnique({
       where: { id: req.params.id },
       include: {
+        createdByUser: {
+          select: {
+            id: true,
+            email: true,
+          },
+        },
         submissions: {
           include: {
             user: {

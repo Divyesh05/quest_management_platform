@@ -53,16 +53,16 @@ export const QuestsPage: React.FC = () => {
     setSelectedDifficulty(difficulty);
     setFilters(prev => ({ 
       ...prev, 
-      difficulty: difficulty as 'easy' | 'medium' | 'hard' || undefined, 
+      difficulty: difficulty as 'Easy' | 'Medium' | 'Hard' || undefined, 
       page: 1 
     }));
   };
 
   const getDifficultyColor = (difficulty: string) => {
     switch (difficulty) {
-      case 'easy': return 'bg-green-100 text-green-800';
-      case 'medium': return 'bg-yellow-100 text-yellow-800';
-      case 'hard': return 'bg-red-100 text-red-800';
+      case 'Easy': return 'bg-green-100 text-green-800';
+      case 'Medium': return 'bg-yellow-100 text-yellow-800';
+      case 'Hard': return 'bg-red-100 text-red-800';
       default: return 'bg-gray-100 text-gray-800';
     }
   };
@@ -120,9 +120,9 @@ export const QuestsPage: React.FC = () => {
             className="px-3 py-2 border rounded-md bg-background"
           >
             <option value="">All Difficulties</option>
-            <option value="easy">Easy</option>
-            <option value="medium">Medium</option>
-            <option value="hard">Hard</option>
+            <option value="Easy">Easy</option>
+            <option value="Medium">Medium</option>
+            <option value="Hard">Hard</option>
           </select>
         </div>
       </div>

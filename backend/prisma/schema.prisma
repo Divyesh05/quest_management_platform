@@ -10,15 +10,17 @@ datasource db {
 model User {
   id        String   @id @default(uuid())
   email     String   @unique
+  name      String?
   password  String
   role      String   @default("user")
   points    Int      @default(0)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  submissions Submission[]
-  achievements Achievement[]
-  rewards     Reward[]
+  submissions   Submission[]
+  achievements  Achievement[]
+  rewards       Reward[]
+  createdQuests Quest[]         @relation("QuestCreator")
 }
 
 model Quest {
@@ -33,9 +35,10 @@ model Quest {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  submissions Submission[]
+  submissions  Submission[]
   achievements Achievement[]
-  rewards     Reward[]
+  rewards      Reward[]
+  createdByUser User?   @relation("QuestCreator", fields: [createdBy], references: [id])
 }
 
 model Submission {

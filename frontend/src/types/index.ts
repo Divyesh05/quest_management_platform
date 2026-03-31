@@ -6,6 +6,7 @@ export interface User {
   points: number;
   createdAt: string;
   updatedAt: string;
+  name?: string;
 }
 
 export interface AuthResponse {
@@ -30,19 +31,23 @@ export interface Quest {
   title: string;
   description: string;
   reward: number;
-  difficulty: 'easy' | 'medium' | 'hard';
+  difficulty: 'Easy' | 'Medium' | 'Hard';
   category: string;
   isActive: boolean;
   createdBy?: string;
   createdAt: string;
   updatedAt: string;
+  createdByUser?: {
+    id: string;
+    email: string;
+  };
 }
 
 export interface CreateQuestData {
   title: string;
   description: string;
   reward: number;
-  difficulty: 'easy' | 'medium' | 'hard';
+  difficulty: 'Easy' | 'Medium' | 'Hard';
   category: string;
 }
 
@@ -50,7 +55,7 @@ export interface UpdateQuestData {
   title?: string;
   description?: string;
   reward?: number;
-  difficulty?: 'easy' | 'medium' | 'hard';
+  difficulty?: 'Easy' | 'Medium' | 'Hard';
   category?: string;
   isActive?: boolean;
 }
@@ -60,7 +65,7 @@ export interface QuestFilters {
   limit?: number;
   search?: string;
   category?: string;
-  difficulty?: 'easy' | 'medium' | 'hard';
+  difficulty?: 'Easy' | 'Medium' | 'Hard';
   isActive?: boolean;
 }
 
