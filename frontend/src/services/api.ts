@@ -36,6 +36,10 @@ api.interceptors.response.use(
       localStorage.removeItem('user');
       window.location.href = '/login';
       toast.error('Session expired. Please login again.');
+    } else if (error.response?.status === 429) {
+      // Rate limit exceeded
+      const retryAfter = error.response.headers['retry-after'] || 30;
+      toast.error(`Too many requests. Please try again in ${retryAfter} seconds.`);
     } else if (error.response?.status === 403) {
       toast.error('You do not have permission to perform this action.');
     } else if (error.response?.status >= 500) {
@@ -50,10 +54,43 @@ api.interceptors.response.use(
   }
 );
 
-// Generic API methods
-export const apiGet = async <T>(url: string, params?: any): Promise<T> => {
-  const response = await api.get(url, { params });
-  return response.data;
+// Retry mechanism with exponential backoff
+const retryRequest = async <T>(
+  requestFn: () => Promise<T>,
+  maxRetries: number = 3,
+  baseDelay: number = 1000
+): Promise<T> => {
+  let lastError: any;
+  
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
+    try {
+      return await requestFn();
+    } catch (error: any) {
+      lastError = error;
+      
+      // Don't retry on client errors (4xx) except 429
+      if (error.response?.status >= 400 && error.response?.status !== 429) {
+        throw error;
+      }
+      
+      // Don't retry on the last attempt
+      if (attempt === maxRetries) {
+        throw error;
+      }
+      
+      // Exponential backoff with jitter
+      const delay = baseDelay * Math.pow(2, attempt) + Math.random() * 1000;
+      await new Promise(resolve => setTimeout(resolve, delay));
+    }
+  }
+  
+  throw lastError;
+};
+
+// Generic API methods with retry
+export const apiGet = async <T>(url: string, params?: any, retry: boolean = false): Promise<T> => {
+  const requestFn = () => api.get(url, { params }).then(res => res.data);
+  return retry ? retryRequest(requestFn) : requestFn();
 };
 
 export const apiPost = async <T>(url: string, data?: any): Promise<T> => {

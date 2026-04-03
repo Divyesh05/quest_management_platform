@@ -7,6 +7,7 @@ import { asyncHandler } from '../../middleware/errorHandler';
 const router = Router();
 
 // Protected routes
+router.get('/my', authenticateToken, asyncHandler(SubmissionController.getUserSubmissions));
 router.get('/', authenticateToken, asyncHandler(SubmissionController.getMySubmissions));
 router.post('/', authenticateToken, validateSubmission, asyncHandler(SubmissionController.createSubmission));
 router.get('/:id', authenticateToken, asyncHandler(SubmissionController.getSubmissionById));

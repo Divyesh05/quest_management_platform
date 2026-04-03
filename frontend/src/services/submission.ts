@@ -29,7 +29,7 @@ export const submissionService = {
     const queryString = params.toString();
     const url = `/submissions/my${queryString ? `?${queryString}` : ''}`;
     
-    return await apiGet<PaginatedResponse<Submission>>(url);
+    return await apiGet<PaginatedResponse<Submission>>(url, undefined, true);
   },
 
   // Get submission by ID

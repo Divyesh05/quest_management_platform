@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { Button } from '../components/ui/button';
@@ -15,13 +15,32 @@ export const QuestDetailPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [submissionContent, setSubmissionContent] = useState('');
+  const loadingRef = useRef(false);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  useEffect(() => {
-    if (id) {
-      loadQuest(id);
-      loadUserSubmission(id);
+  const loadUserSubmission = useCallback(async (questId: string) => {
+    // Prevent multiple simultaneous calls
+    if (loadingRef.current) return;
+    
+    try {
+      loadingRef.current = true;
+      const response = await submissionService.getMySubmissions({
+        questId,
+        limit: 1,
+      });
+      if (response.data.length > 0) {
+        setUserSubmission(response.data[0]);
+      }
+    } catch (error: any) {
+      console.error('Failed to load user submission:', error);
+      // Don't show toast for 429 errors here to avoid spam
+      if (error.response?.status !== 429) {
+        // Optional: Add toast notification here if needed
+      }
+    } finally {
+      loadingRef.current = false;
     }
-  }, [id]);
+  }, []);
 
   const loadQuest = async (questId: string) => {
     try {
@@ -34,19 +53,26 @@ export const QuestDetailPage: React.FC = () => {
     }
   };
 
-  const loadUserSubmission = async (questId: string) => {
-    try {
-      const response = await submissionService.getMySubmissions({
-        questId,
-        limit: 1,
-      });
-      if (response.data.length > 0) {
-        setUserSubmission(response.data[0]);
+  useEffect(() => {
+    if (id) {
+      loadQuest(id);
+      
+      // Debounce the submission loading to prevent rapid API calls
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
       }
-    } catch (error) {
-      console.error('Failed to load user submission:', error);
+      
+      timeoutRef.current = setTimeout(() => {
+        loadUserSubmission(id);
+      }, 300); // 300ms delay
     }
-  };
+    
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+    };
+  }, [id, loadUserSubmission]);
 
   const handleSubmitSubmission = async () => {
     if (!quest || !submissionContent.trim()) return;
