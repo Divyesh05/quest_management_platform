@@ -93,6 +93,11 @@ try {
   app.use('/api/auth', authRoutes);
   console.log('✅ Auth routes loaded');
 
+  // User routes
+  const userRoutes = require('./modules/user/routes').default;
+  app.use('/api/users', userRoutes);
+  console.log('✅ User routes loaded');
+
   // Quest routes
   const questRoutes = require('./modules/quests/routes').default;
   app.use('/api/quests', questRoutes);
@@ -151,6 +156,11 @@ const startServer = async () => {
     console.log(`   POST /api/auth/register    - Register new user`);
     console.log(`   POST /api/auth/login       - User login`);
     console.log(`   GET  /api/auth/profile     - Get user profile`);
+    console.log(`   GET  /api/users            - Get all users (admin)`);
+    console.log(`   GET  /api/users/:id        - Get user by ID (admin)`);
+    console.log(`   PUT  /api/users/:id        - Update user (admin)`);
+    console.log(`   DELETE /api/users/:id     - Delete user (admin)`);
+    console.log(`   PUT  /api/users/:id/points - Add points to user (admin)`);
     console.log(`   GET  /api/quests           - Get all quests`);
     console.log(`   POST /api/quests           - Create quest (admin)`);
     console.log(`   GET  /api/submissions      - Get submissions (admin)`);
