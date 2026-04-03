@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { authService } from '@/services/auth';
+import { socketService } from '@/services/socket';
 
 interface NavigationProps {
   user?: any;
@@ -10,7 +11,17 @@ interface NavigationProps {
 export const Navigation: React.FC<NavigationProps> = ({ user }) => {
   const location = useLocation();
 
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (user && token) {
+      socketService.connect(token);
+    } else {
+      socketService.disconnect();
+    }
+  }, [user]);
+
   const handleLogout = () => {
+    socketService.disconnect();
     authService.logout();
   };
 

@@ -76,6 +76,8 @@ export interface Submission {
   questId: string;
   status: 'pending' | 'approved' | 'rejected';
   content?: string;
+  fileUrl?: string;
+  fileName?: string;
   submittedAt: string;
   reviewedAt?: string;
   reviewedBy?: string;
@@ -87,6 +89,7 @@ export interface Submission {
 export interface CreateSubmissionData {
   questId: string;
   content?: string;
+  file?: File;
 }
 
 export interface UpdateSubmissionData {

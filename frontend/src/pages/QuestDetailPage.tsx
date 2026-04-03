@@ -15,6 +15,7 @@ export const QuestDetailPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [submissionContent, setSubmissionContent] = useState('');
+  const [submissionFile, setSubmissionFile] = useState<File | null>(null);
   const loadingRef = useRef(false);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -75,16 +76,18 @@ export const QuestDetailPage: React.FC = () => {
   }, [id, loadUserSubmission]);
 
   const handleSubmitSubmission = async () => {
-    if (!quest || !submissionContent.trim()) return;
+    if (!quest || (!submissionContent.trim() && !submissionFile)) return;
 
     try {
       setSubmitting(true);
       const submission = await submissionService.createSubmission({
         questId: quest.id,
         content: submissionContent,
+        file: submissionFile || undefined,
       });
       setUserSubmission(submission);
       setSubmissionContent('');
+      setSubmissionFile(null);
     } catch (error) {
       console.error('Failed to submit quest:', error);
     } finally {
@@ -198,6 +201,21 @@ export const QuestDetailPage: React.FC = () => {
                     <p className="text-muted-foreground whitespace-pre-wrap">
                       {userSubmission.content}
                     </p>
+                    {userSubmission.fileUrl && (
+                      <div className="mt-4 p-3 bg-muted rounded flex items-center justify-between">
+                        <span className="text-sm font-medium truncate mr-2">
+                          {userSubmission.fileName || 'Attached File'}
+                        </span>
+                        <a
+                          href={userSubmission.fileUrl}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="text-sm text-blue-500 hover:underline flex-shrink-0"
+                        >
+                          View File
+                        </a>
+                      </div>
+                    )}
                   </div>
                   
                   {userSubmission.feedback && (
@@ -231,7 +249,7 @@ export const QuestDetailPage: React.FC = () => {
                     <div className="space-y-4">
                       <div>
                         <label htmlFor="submission" className="block text-sm font-medium mb-2">
-                          Your Submission
+                          Your Submission Notes
                         </label>
                         <Textarea
                           id="submission"
@@ -241,10 +259,22 @@ export const QuestDetailPage: React.FC = () => {
                           rows={6}
                         />
                       </div>
+
+                      <div>
+                        <label htmlFor="file-upload" className="block text-sm font-medium mb-2">
+                          Upload Proof (Optional)
+                        </label>
+                        <input
+                          id="file-upload"
+                          type="file"
+                          className="w-full mt-1 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20"
+                          onChange={(e) => setSubmissionFile(e.target.files?.[0] || null)}
+                        />
+                      </div>
                       
                       <Button
                         onClick={handleSubmitSubmission}
-                        disabled={!submissionContent.trim() || submitting}
+                        disabled={(!submissionContent.trim() && !submissionFile) || submitting}
                         className="w-full"
                       >
                         {submitting ? 'Submitting...' : 'Submit Quest'}

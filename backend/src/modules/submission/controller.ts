@@ -13,10 +13,36 @@ export class SubmissionController {
 
   createSubmission = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
+      let fileUrl: string | undefined;
+      let fileName: string | undefined;
+
+      if (req.file) {
+        const { supabase } = require('../../utils/supabase');
+        const stamp = Date.now();
+        const safeName = req.file.originalname.replace(/[^a-zA-Z0-9.\-_]/g, '');
+        const name = `${stamp}-${safeName}`;
+        
+        const { error } = await supabase.storage.from('submissions').upload(name, req.file.buffer, {
+          contentType: req.file.mimetype,
+        });
+        
+        if (error) {
+          console.error("Supabase upload error:", error);
+          throw new Error('Failed to upload file');
+        }
+        
+        const { data: publicUrlData } = supabase.storage.from('submissions').getPublicUrl(name);
+        fileUrl = publicUrlData.publicUrl;
+        fileName = req.file.originalname;
+      }
+
       const validatedData: ICreateSubmissionData = {
         ...validateCreateSubmission(req.body),
         userId: (req as any).user.userId
       };
+      if (fileUrl) validatedData.fileUrl = fileUrl;
+      if (fileName) validatedData.fileName = fileName;
+      
       const submission = await this.submissionService.createSubmission(validatedData);
 
       res.status(201).json({

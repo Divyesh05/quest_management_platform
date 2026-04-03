@@ -47,6 +47,8 @@ model Submission {
   questId     String
   status      String   @default("pending")
   content     String?
+  fileUrl     String?
+  fileName    String?
   submittedAt DateTime @default(now())
   reviewedAt  DateTime?
   reviewedBy  String?

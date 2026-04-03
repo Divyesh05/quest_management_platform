@@ -109,9 +109,15 @@ export const apiDelete = async <T>(url: string): Promise<T> => {
 };
 
 // File upload method
-export const apiUpload = async <T>(url: string, file: File, onProgress?: (progress: number) => void): Promise<T> => {
+export const apiUpload = async <T>(url: string, file: File, data?: Record<string, any>, onProgress?: (progress: number) => void): Promise<T> => {
   const formData = new FormData();
   formData.append('file', file);
+  
+  if (data) {
+    Object.keys(data).forEach(key => {
+      formData.append(key, String(data[key]));
+    });
+  }
 
   const response = await api.post(url, formData, {
     headers: {

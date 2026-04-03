@@ -4,6 +4,8 @@ export interface ISubmissionResponse {
   questId: string;
   status: 'pending' | 'approved' | 'rejected';
   content?: string;
+  fileUrl?: string;
+  fileName?: string;
   submittedAt: Date;
   reviewedAt?: Date;
   reviewedBy?: string;
@@ -25,7 +27,9 @@ export interface ISubmissionResponse {
 
 export interface ICreateSubmissionData {
   questId: string;
-  content: string;
+  content?: string;
+  fileUrl?: string;
+  fileName?: string;
   userId: string;
 }
 

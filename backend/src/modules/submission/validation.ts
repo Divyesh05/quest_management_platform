@@ -3,7 +3,7 @@ import { ICreateSubmissionData, IUpdateSubmissionData, ISubmissionFilters } from
 
 export const createSubmissionSchema = z.object({
   questId: z.string().min(1, 'Quest ID is required'),
-  content: z.string().min(1, 'Content is required').max(5000, 'Content too long')
+  content: z.string().max(5000, 'Content too long').optional()
 });
 
 export const updateSubmissionSchema = z.object({

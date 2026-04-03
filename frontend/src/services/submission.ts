@@ -39,6 +39,12 @@ export const submissionService = {
 
   // Create new submission
   createSubmission: async (data: CreateSubmissionData): Promise<Submission> => {
+    if (data.file) {
+      const file = data.file;
+      const payload: any = { questId: data.questId };
+      if (data.content) payload.content = data.content;
+      return await apiUpload<Submission>('/submissions', file, payload);
+    }
     return await apiPost<Submission>('/submissions', data);
   },
 

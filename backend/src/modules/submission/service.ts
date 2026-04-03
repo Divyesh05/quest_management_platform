@@ -52,6 +52,8 @@ export class SubmissionService implements ISubmissionService {
         userId: data.userId,
         questId: data.questId,
         content: data.content,
+        fileUrl: data.fileUrl,
+        fileName: data.fileName,
         status: 'pending'
       },
       include: {

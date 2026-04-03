@@ -542,7 +542,7 @@ const DashboardPage: React.FC = () => {
                   >
                     <div className="flex justify-between items-start mb-2">
                       <h4 className="text-sm font-medium text-foreground">
-                        {submission.questId}
+                        {submission?.quest?.title}
                       </h4>
                       <span className={`px-2 py-1 text-xs rounded-full ${
                         submission.status === 'approved' 

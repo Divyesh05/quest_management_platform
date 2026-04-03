@@ -7,11 +7,15 @@ import rateLimit from 'express-rate-limit';
 import dotenv from 'dotenv';
 import { errorHandler, notFoundHandler } from './middleware/errorHandler';
 import { connectDatabase } from './modules/database/service';
+import { setupSwagger } from './utils/swagger';
 
 // Load environment variables
 dotenv.config();
 
 const app = express();
+
+// Setup Swagger UI
+setupSwagger(app);
 
 // Rate limiting
 const limiter = rateLimit({
@@ -128,7 +132,7 @@ try {
 app.use(notFoundHandler);
 app.use(errorHandler);
 
-const PORT = process.env.PORT || 5000;
+const PORT = Number(process.env.PORT || 5000);
 
 // Initialize database and start server
 const startServer = async () => {
@@ -145,6 +149,10 @@ const startServer = async () => {
     // Socket options to prevent address in use errors
     exclusive: true,
   }, () => {
+    // Initialize Socket.io after server starts listening
+    const { initializeSocket } = require('./modules/realtime/socket');
+    initializeSocket(server);
+
     console.log(`\n🚀 Quest Management Server started successfully!`);
     console.log(`📊 Environment: ${process.env.NODE_ENV || 'development'}`);
     console.log(`🔗 Frontend URL: ${process.env.FRONTEND_URL || 'http://localhost:3000'}`);

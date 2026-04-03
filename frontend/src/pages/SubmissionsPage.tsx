@@ -161,8 +161,23 @@ export const SubmissionsPage: React.FC = () => {
                     <h4 className="font-semibold mb-2">Submission:</h4>
                     <div className="p-4 bg-muted rounded-lg">
                       <p className="text-muted-foreground whitespace-pre-wrap">
-                        {submission.content || "No content provided"}
+                        {submission.content || "No text content provided"}
                       </p>
+                      {submission.fileUrl && (
+                        <div className="mt-4 p-3 bg-background border rounded flex items-center justify-between">
+                          <span className="text-sm font-medium truncate mr-2">
+                            {submission.fileName || 'Attached File'}
+                          </span>
+                          <a
+                            href={submission.fileUrl}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="text-sm text-blue-500 hover:underline flex-shrink-0"
+                          >
+                            View File
+                          </a>
+                        </div>
+                      )}
                     </div>
                   </div>
 
